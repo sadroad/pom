@@ -1,7 +1,7 @@
 use indicatif::{ProgressBar, ProgressStyle};
 use inquire::Select;
 use notify_rust::Notification;
-use std::{process::exit, thread::sleep, time::Duration};
+use std::{io::Cursor, process::exit, thread::sleep, time::Duration};
 
 fn main() {
     let work_complete = Notification::new()
@@ -13,6 +13,11 @@ fn main() {
         .body("Break Over")
         .finalize();
 
+    let stream_handle = rodio::OutputStreamBuilder::open_default_stream()
+        .expect("Default audio stream unable to open");
+
+    let alert_file = include_bytes!("alert.mp3");
+    let sink = rodio::Sink::connect_new(stream_handle.mixer());
     loop {
         let options = vec!["25m/5m", "50m/10m", "all done"];
         let time_choice = Select::new("Split", options).prompt();
@@ -35,6 +40,8 @@ fn main() {
         }
         pb.finish_and_clear();
         _ = work_complete.show();
+        sink.append(rodio::Decoder::new(Cursor::new(alert_file)).unwrap());
+        sink.sleep_until_end();
 
         let options = vec!["Yes", "No"];
         let confirm = Select::new("Ready for a break?", options).prompt();
@@ -62,5 +69,7 @@ fn main() {
         }
         pb.finish_and_clear();
         _ = break_done.show();
+        sink.append(rodio::Decoder::new(Cursor::new(alert_file)).unwrap());
+        sink.sleep_until_end();
     }
 }

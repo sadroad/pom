@@ -27,7 +27,7 @@
               inherit system;
               overlays = [ (import rust-overlay) ];
             };
-            rustToolchain = pkgs.rust-bin.stable."1.93.0".default;
+            rustToolchain = pkgs.rust-bin.stable.latest.default;
           in
           f pkgs rustToolchain
         );
@@ -41,7 +41,7 @@
             rustc = rustToolchain;
           };
         in
-        {
+        rec {
           default = rustPlatform.buildRustPackage {
             pname = "pom";
             version = "0.1.0";
@@ -52,12 +52,21 @@
               lockFile = ./Cargo.lock;
             };
 
+            nativeBuildInputs = pkgs.lib.optionals pkgs.stdenv.isLinux [
+              pkgs.pkg-config
+            ];
+
+            buildInputs = pkgs.lib.optionals pkgs.stdenv.isLinux [
+              pkgs.alsa-lib
+            ];
+
             meta = {
               description = "Simple pomodoro timer CLI with desktop notifications";
               license = pkgs.lib.licenses.unlicense;
               mainProgram = "pom";
             };
           };
+          pom = default;
         }
       );
 
@@ -73,6 +82,7 @@
         in
         {
           default = pkgs.mkShell {
+            inputsFrom = [ self.packages.${pkgs.stdenv.hostPlatform.system}.pom ];
             packages = with pkgs; [
               rustToolchainWithExtensions
             ];
