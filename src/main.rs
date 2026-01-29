@@ -41,6 +41,7 @@ fn main() {
         pb.finish_and_clear();
         _ = work_complete.show();
         sink.append(rodio::Decoder::new(Cursor::new(alert_file)).unwrap());
+        sink.set_volume(4.0);
         sink.sleep_until_end();
 
         let options = vec!["Yes", "No"];
@@ -70,6 +71,7 @@ fn main() {
         pb.finish_and_clear();
         _ = break_done.show();
         sink.append(rodio::Decoder::new(Cursor::new(alert_file)).unwrap());
+        sink.set_volume(4.0);
         sink.sleep_until_end();
     }
 }
