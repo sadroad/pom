@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    systems.url = "github:nix-systems/default";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -11,16 +12,13 @@
     {
       self,
       nixpkgs,
+      systems,
       rust-overlay,
     }:
     let
-      systems = [
-        "x86_64-linux"
-        "aarch64-darwin"
-      ];
       forEachSystem =
         f:
-        nixpkgs.lib.genAttrs systems (
+        nixpkgs.lib.genAttrs (import systems) (
           system:
           let
             pkgs = import nixpkgs {
