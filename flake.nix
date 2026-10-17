@@ -50,11 +50,11 @@
               lockFile = ./Cargo.lock;
             };
 
-            nativeBuildInputs = pkgs.lib.optionals pkgs.stdenv.isLinux [
+            nativeBuildInputs = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
               pkgs.pkg-config
             ];
 
-            buildInputs = pkgs.lib.optionals pkgs.stdenv.isLinux [
+            buildInputs = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
               pkgs.alsa-lib
             ];
 
